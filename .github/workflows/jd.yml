@@ -21,8 +21,9 @@ env:
   # 风控优化：请求间随机延迟（毫秒），默认 5-15 秒
   JD_DELAY: '5000-15000'
   # 风控优化：禁用的接口代号（逗号分隔）。留空则全量签到。
-  # 默认关闭超市/秒杀/现金红包等非核心+易风控接口，保留京豆/钢镚/转盘等核心收益
-  JD_DISABLE: 'JDGStore,JDSecKill,JDGetCash'
+  # 实测：京豆主签到(JDBean)/转盘(JDTurn)/现金红包(JDCash) 已被京东新签名拦截报错，
+  # 禁用可避免反复 403/参数异常触发风控；保留钢镚(JRSteel)/魔方(JDCube) 等有真实响应的接口。
+  JD_DISABLE: 'JDBean,JDTurn,JDCash'
   # 风控优化关键：请求 UA 必须与抓取 Cookie 的浏览器 UA 一致！
   # 你从 Mac Firefox 抓的 Cookie，这里就用 Firefox 桌面 UA。可设为 Secret JD_UA 覆盖。
   JD_UA: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:156.0) Gecko/20100101 Firefox/156.0'
