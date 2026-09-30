@@ -1,0 +1,48 @@
+name: JD Sign
+
+on:
+  # 每天北京时间 00:00 触发（cron 是 UTC 时间，00:15 UTC+8 = 前一天 16:15 UTC）
+  schedule:
+    - cron: '15 16 * * *'
+  # 允许手动触发，方便调试
+  workflow_dispatch:
+  # 仓库被点亮 Star 时触发（方便首次测试）
+  watch:
+    types: [started]
+
+# 配置环境变量（从 GitHub Secrets 读取，不要写死在代码里）
+env:
+  JD_COOKIE: ${{ secrets.JD_COOKIE }}
+  JD_COOKIE2: ${{ secrets.JD_COOKIE2 }}
+  JD_COOKIE3: ${{ secrets.JD_COOKIE3 }}
+  PUSH_KEY: ${{ secrets.PUSH_KEY }}
+  BARK_KEY: ${{ secrets.BARK_KEY }}
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install request dependency
+        # NobyDa 脚本内部依赖 request 模块
+        run: npm install request
+
+      - name: Run JD sign script
+        run: node jd_sign.js
+
+      - name: Upload result artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sign-result
+          path: |
+            ./result.txt
+            ./error.txt
+          if-no-files-found: ignore
