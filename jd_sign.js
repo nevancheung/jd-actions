@@ -28,7 +28,7 @@ const JD_DISABLE = (process.env.JD_DISABLE || '').trim()
 // 默认给一个桌面 Firefox 常用 UA（若你抓 Cookie 的口径不同，务必设置 JD_UA）
 const JD_UA =
   process.env.JD_UA ||
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0'
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:156.0) Gecko/20100101 Firefox/156.0'
 
 const SCRIPT_PATH = './JD_DailyBonus.js'
 const RESULT_PATH = './result.txt'

@@ -25,7 +25,7 @@ env:
   JD_DISABLE: 'JDGStore,JDSecKill,JDGetCash'
   # 风控优化关键：请求 UA 必须与抓取 Cookie 的浏览器 UA 一致！
   # 你从 Mac Firefox 抓的 Cookie，这里就用 Firefox 桌面 UA。可设为 Secret JD_UA 覆盖。
-  JD_UA: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0'
+  JD_UA: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:156.0) Gecko/20100101 Firefox/156.0'
 
 jobs:
   sign:
