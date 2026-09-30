@@ -18,6 +18,13 @@ const SCRIPT_URL =
   process.env.JD_SCRIPT_URL ||
   'https://raw.githubusercontent.com/NobyDa/Script/master/JD-DailyBonus/JD_DailyBonus.js'
 
+// ---- 风控优化参数 ----
+// 请求间随机延迟区间（单位毫秒），模拟真人；默认 5-15 秒随机
+const RANDOM_DELAY = process.env.JD_DELAY || '5000-15000'
+// 要禁用的接口代号（逗号分隔），只保留核心京豆签到 JDBean，降低风控面
+// 如需全量签到，留空即可
+const JD_DISABLE = (process.env.JD_DISABLE || '').trim()
+
 const SCRIPT_PATH = './JD_DailyBonus.js'
 const RESULT_PATH = './result.txt'
 const ERROR_PATH = './error.txt'
@@ -159,6 +166,24 @@ async function main() {
       // 如果脚本不含 OtherKey，降级注入 Key
       content = content.replace(/var Key = '';/, `var Key = '${otherKey}';`)
     }
+
+    // 风控优化1：注入随机延迟（脚本原生支持 var stop，支持区间随机）
+    if (RANDOM_DELAY && /var stop = '0';/.test(content)) {
+      content = content.replace(/var stop = '0';/, `var stop = '${RANDOM_DELAY}';`)
+      console.log(`   已注入随机延迟: ${RANDOM_DELAY} (毫秒)`)
+    }
+
+    // 风控优化2：禁用高风险/低收益接口，只保留核心京豆（JDBean）
+    if (JD_DISABLE) {
+      // 通过脚本持久化键 JD_DailyBonusDisables 注入禁用列表
+      const nodeSet = './CookieSet.json'
+      let set = {}
+      try { set = JSON.parse(fs.readFileSync(nodeSet, 'utf8') || '{}') } catch (e) { set = {} }
+      set.JD_DailyBonusDisables = JD_DISABLE
+      fs.writeFileSync(nodeSet, JSON.stringify(set), 'utf8')
+      console.log(`   已禁用接口: ${JD_DISABLE}`)
+    }
+
     fs.writeFileSync(SCRIPT_PATH, content, 'utf8')
     console.log(`   已写入账号数: ${JSON.parse(otherKey).length}`)
 

@@ -1,9 +1,10 @@
 name: JD Sign
 
 on:
-  # 每天北京时间 00:00 触发（cron 是 UTC 时间，00:15 UTC+8 = 前一天 16:15 UTC）
+  # 每天北京时间 07:15 触发（cron 是 UTC，07:15 UTC+8 = 前一天 23:15 UTC）
+  # 避开凌晨 0 点的全网薅羊毛高峰，降低 Cookie 被风控概率
   schedule:
-    - cron: '15 16 * * *'
+    - cron: '15 23 * * *'
   # 允许手动触发，方便调试
   workflow_dispatch:
   # 仓库被点亮 Star 时触发（方便首次测试）
@@ -17,6 +18,11 @@ env:
   JD_COOKIE3: ${{ secrets.JD_COOKIE3 }}
   PUSH_KEY: ${{ secrets.PUSH_KEY }}
   BARK_KEY: ${{ secrets.BARK_KEY }}
+  # 风控优化：请求间随机延迟（毫秒），默认 5-15 秒
+  JD_DELAY: '5000-15000'
+  # 风控优化：禁用的接口代号（逗号分隔）。留空则全量签到。
+  # 默认关闭超市/秒杀/现金红包等非核心+易风控接口，保留京豆/钢镚/转盘等核心收益
+  JD_DISABLE: 'JDGStore,JDSecKill,JDGetCash'
 
 jobs:
   sign:
