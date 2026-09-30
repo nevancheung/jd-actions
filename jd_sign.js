@@ -24,6 +24,11 @@ const RANDOM_DELAY = process.env.JD_DELAY || '5000-15000'
 // 要禁用的接口代号（逗号分隔），只保留核心京豆签到 JDBean，降低风控面
 // 如需全量签到，留空即可
 const JD_DISABLE = (process.env.JD_DISABLE || '').trim()
+// 请求 UA。必须与抓取 Cookie 时的浏览器 UA 保持一致，否则京东会判定异常导致封号。
+// 默认给一个桌面 Firefox 常用 UA（若你抓 Cookie 的口径不同，务必设置 JD_UA）
+const JD_UA =
+  process.env.JD_UA ||
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0'
 
 const SCRIPT_PATH = './JD_DailyBonus.js'
 const RESULT_PATH = './result.txt'
@@ -182,6 +187,17 @@ async function main() {
       set.JD_DailyBonusDisables = JD_DISABLE
       fs.writeFileSync(nodeSet, JSON.stringify(set), 'utf8')
       console.log(`   已禁用接口: ${JD_DISABLE}`)
+    }
+
+    // 风控优化3：替换请求 UA 为抓 Cookie 时一致的桌面浏览器 UA（关键！）
+    if (JD_UA) {
+      const oldUA = /options\.headers\['User-Agent'\] = '([^']*)'/g
+      if (oldUA.test(content)) {
+        content = content.replace(oldUA, `options.headers['User-Agent'] = '${JD_UA}'`)
+        console.log(`   已替换请求 UA`)
+      } else {
+        console.log('   未找到 UA 注入点，跳过')
+      }
     }
 
     fs.writeFileSync(SCRIPT_PATH, content, 'utf8')
